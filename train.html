@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en-us">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>Train Schedule</title>
+
+    <!-- Moment -->
+    <script src="https://unpkg.com/moment"></script>
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Bootstrap CDN-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <!-- Firebase Reference -->
+    <script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <br>
+
+        <body>
+                <div class="container"> 
+                        <div class="jumbotron">
+                                <h1 class="display-4 text-center">TRAIN TIME</h1>
+                                <p class="lead text-center">An Up-to-Date Train Schedule and Submission Form</p></div>
+                        <table class="table">
+                                <thead class = "bg-secondary">
+                                  <tr>
+                                    <th scope="col">Train Name</th>
+                                    <th scope="col">Destination</th>
+                                    <th scope="col">Frequency (min)</th>
+                                    <th scope="col">Next Arrival</th>
+                                    <th scope="col">Minutes Away</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td>Wardrobe Express</td>
+                                    <td>Narnia</td>
+                                    <td>60</td>
+                                    <td>12:30 PM</td>
+                                    <td>540</td>
+                                  </tr>
+                                  
+                                </tbody>
+                              </table>
+
+
+        <!-- Form entry -->
+        <br>
+        <p class = "bg-secondary"><b>Train Scheduler</b></p>
+        <form role="form">
+            <div class="form-group">
+                <label for="name-input">Train Name</label>
+                <input class="form-control" id="name-input" type="text">
+            </div>
+            <div class="form-group">
+                <label for="destination-input">Destination</label>
+                <input class="form-control" id="destination-input" type="text">
+            </div>
+            <div class="form-group">
+                <label for="date-input">First Train Time - (HH:mm) military time</label>
+                <input class="form-control" id="time-input" type="text">
+            </div>
+            <div class="form-group">
+                <label for="frequency-input">Frequency (min)</label>
+                <input class="form-control" id="frequency-input" type="number"></input>
+            </div>
+            <button class="btn btn-primary btn-lg" id="add-train" type="submit">Submit</button>
+        </form>
+
+        <br>
+        <br>
+
+
+    </div>
+
+    <!-- JavaScript -->
+    <script src="train.js"></script>
+
+
+</body>
+
+</html>
