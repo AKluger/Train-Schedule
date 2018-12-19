@@ -8,7 +8,7 @@ var config = {
     projectId: "train-scheduler-91ad1",
     storageBucket: "train-scheduler-91ad1.appspot.com",
     messagingSenderId: "163791885723"
-  };
+};
 
 firebase.initializeApp(config);
 
@@ -35,64 +35,70 @@ $("#add-train").on("click", function (event) {
     //clear form
     $("input").val("")
 
-    //prevent duplicate row but this also will trigger another update overlapping the previous.  Could write duplicate function without timer to trigger here instead
+    //prevent duplicate row 
     updater()
 });
 
-var updater = function()    {
-    
+var updater = function () {
+
     //empty table so only updated times display
     $("tbody").empty()
 
-database.ref().on("child_added", function (snapshot) {
-    // storing the snapshot.val() in a variable for convenience
-    var sv = snapshot.val();
-    // Console.logging the last user's data
-    console.log(sv.name);
-    console.log(sv.frequency);
-    console.log(sv.firstTime);
-    console.log(sv.destination);
+    database.ref().on("child_added", function (snapshot) {
+        // storing the snapshot.val() in a variable for convenience
+        var sv = snapshot.val();
+        // Console.logging the last user's data
+        console.log(sv.name);
+        console.log(sv.frequency);
+        console.log(sv.firstTime);
+        console.log(sv.destination);
 
-    // First Time (pushed back 1 year to make sure it comes before current time)
-    var firstTimeConverted = moment(sv.firstTime, "HH:mm").subtract(1, "years");
-  
-    // Current Time
-    var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
+        // First Time (pushed back 1 year to make sure it comes before current time)
+        var firstTimeConverted = moment(sv.firstTime, "HH:mm").subtract(1, "years");
 
-    // Difference between the times
-    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+        // Current Time
+        var currentTime = moment();
+        console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
 
-    // Time apart (remainder)
-    var tRemainder = diffTime % sv.frequency;
+        // Difference between the times
+        var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
 
-    // Minutes Until Train
-    var minutesAway = sv.frequency - tRemainder;
+        // Time apart (remainder)
+        var tRemainder = diffTime % sv.frequency;
 
-    // Next Train
-    var nextTrain = moment().add(minutesAway, "minutes");
-    nextTrain = moment(nextTrain).format("HH:mm")
+        // Minutes Until Train
+        var minutesAway = sv.frequency - tRemainder;
 
-    var subtracted = moment().diff(sv.firstTime, 'minutes');
-    
-    // Change the HTML to reflect
-    $("tbody").append("<tr>  <td > " + sv.name + " </td>" +
-        "<td> " + sv.destination + " </td>" +
-        "<td> " + sv.frequency + " </td>" +
-        "<td> " + nextTrain + " </td>" +
-        "<td> " + minutesAway + " </td>"
-    )
+        // Next Train
+        var nextTrain = moment().add(minutesAway, "minutes");
+        nextTrain = moment(nextTrain).format("HH:mm")
 
-// $("td:empty").parent().remove()
+        var subtracted = moment().diff(sv.firstTime, 'minutes');
 
-    // Handle the errors
-}, function (errorObject) {
-    console.log("Errors handled: " + errorObject.code);
-});
+        // Change the HTML to reflect
+        $("tbody").append("<tr>  <td > " + sv.name + " </td>" +
+            "<td> " + sv.destination + " </td>" +
+            "<td> " + sv.frequency + " </td>" +
+            "<td> " + nextTrain + " </td>" +
+            "<td> " + minutesAway + " </td>"
+        )
 
+        // Handle the errors
+    }, function (errorObject) {
+        console.log("Errors handled: " + errorObject.code);
+    });
 
-//countdown to refresh every minute
-update = setTimeout(updater, 1000*60)
+    //keeping site up to date to the second
+    currentTime = moment().format("HH:mm");
+    var checkTime = function () {
+        update = setTimeout(checkTime, 1000)
+        if (currentTime !== moment().format("HH:mm")) {
+            updater()
+        }
+    }
+
+    //countdown function to refresh page when time changes
+    checkTime()
 }
 
 updater()
