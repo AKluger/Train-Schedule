@@ -1,3 +1,5 @@
+
+var update;
 // Initialize Firebase
 var config = {
     apiKey: "AIzaSyAGubFMxHrOGpJVfIoWVMVf6ERDKx5zg8Y",
@@ -32,7 +34,15 @@ $("#add-train").on("click", function (event) {
     });
     //clear form
     $("input").val("")
+
+    //prevent duplicate row but this also will trigger another update overlapping the previous.  Could write duplicate function without timer to trigger here instead
+    updater()
 });
+
+var updater = function()    {
+    
+    //empty table so only updated times display
+    $("tbody").empty()
 
 database.ref().on("child_added", function (snapshot) {
     // storing the snapshot.val() in a variable for convenience
@@ -64,7 +74,7 @@ database.ref().on("child_added", function (snapshot) {
     nextTrain = moment(nextTrain).format("HH:mm")
 
     var subtracted = moment().diff(sv.firstTime, 'minutes');
-
+    
     // Change the HTML to reflect
     $("tbody").append("<tr>  <td > " + sv.name + " </td>" +
         "<td> " + sv.destination + " </td>" +
@@ -73,7 +83,16 @@ database.ref().on("child_added", function (snapshot) {
         "<td> " + minutesAway + " </td>"
     )
 
+// $("td:empty").parent().remove()
+
     // Handle the errors
 }, function (errorObject) {
     console.log("Errors handled: " + errorObject.code);
 });
+
+
+//countdown to refresh every minute
+update = setTimeout(updater, 1000*60)
+}
+
+updater()
