@@ -1,3 +1,5 @@
+
+var update;
 // Initialize Firebase
 var config = {
     apiKey: "AIzaSyAGubFMxHrOGpJVfIoWVMVf6ERDKx5zg8Y",
@@ -6,7 +8,7 @@ var config = {
     projectId: "train-scheduler-91ad1",
     storageBucket: "train-scheduler-91ad1.appspot.com",
     messagingSenderId: "163791885723"
-  };
+};
 
 firebase.initializeApp(config);
 
@@ -32,48 +34,71 @@ $("#add-train").on("click", function (event) {
     });
     //clear form
     $("input").val("")
+
+    //prevent duplicate row 
+    updater()
 });
 
-database.ref().on("child_added", function (snapshot) {
-    // storing the snapshot.val() in a variable for convenience
-    var sv = snapshot.val();
-    // Console.logging the last user's data
-    console.log(sv.name);
-    console.log(sv.frequency);
-    console.log(sv.firstTime);
-    console.log(sv.destination);
+var updater = function () {
 
-    // First Time (pushed back 1 year to make sure it comes before current time)
-    var firstTimeConverted = moment(sv.firstTime, "HH:mm").subtract(1, "years");
-  
-    // Current Time
-    var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
+    //empty table so only updated times display
+    $("tbody").empty()
 
-    // Difference between the times
-    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    database.ref().on("child_added", function (snapshot) {
+        // storing the snapshot.val() in a variable for convenience
+        var sv = snapshot.val();
+        // Console.logging the last user's data
+        console.log(sv.name);
+        console.log(sv.frequency);
+        console.log(sv.firstTime);
+        console.log(sv.destination);
 
-    // Time apart (remainder)
-    var tRemainder = diffTime % sv.frequency;
+        // First Time (pushed back 1 year to make sure it comes before current time)
+        var firstTimeConverted = moment(sv.firstTime, "HH:mm").subtract(1, "years");
 
-    // Minutes Until Train
-    var minutesAway = sv.frequency - tRemainder;
+        // Current Time
+        var currentTime = moment();
+        console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
 
-    // Next Train
-    var nextTrain = moment().add(minutesAway, "minutes");
-    nextTrain = moment(nextTrain).format("HH:mm")
+        // Difference between the times
+        var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
 
-    var subtracted = moment().diff(sv.firstTime, 'minutes');
+        // Time apart (remainder)
+        var tRemainder = diffTime % sv.frequency;
 
-    // Change the HTML to reflect
-    $("tbody").append("<tr>  <td > " + sv.name + " </td>" +
-        "<td> " + sv.destination + " </td>" +
-        "<td> " + sv.frequency + " </td>" +
-        "<td> " + nextTrain + " </td>" +
-        "<td> " + minutesAway + " </td>"
-    )
+        // Minutes Until Train
+        var minutesAway = sv.frequency - tRemainder;
 
-    // Handle the errors
-}, function (errorObject) {
-    console.log("Errors handled: " + errorObject.code);
-});
+        // Next Train
+        var nextTrain = moment().add(minutesAway, "minutes");
+        nextTrain = moment(nextTrain).format("HH:mm")
+
+        var subtracted = moment().diff(sv.firstTime, 'minutes');
+
+        // Change the HTML to reflect
+        $("tbody").append("<tr>  <td > " + sv.name + " </td>" +
+            "<td> " + sv.destination + " </td>" +
+            "<td> " + sv.frequency + " </td>" +
+            "<td> " + nextTrain + " </td>" +
+            "<td> " + minutesAway + " </td>"
+        )
+
+        // Handle the errors
+    }, function (errorObject) {
+        console.log("Errors handled: " + errorObject.code);
+    });
+
+    //keeping site up to date to the second
+    currentTime = moment().format("HH:mm");
+    var checkTime = function () {
+        update = setTimeout(checkTime, 1000)
+        if (currentTime !== moment().format("HH:mm")) {
+            updater()
+        }
+    }
+
+    //countdown function to refresh page when time changes
+    checkTime()
+}
+
+updater()
